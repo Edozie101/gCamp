@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -11,6 +12,10 @@ Rails.application.routes.draw do
 
    get 'about' => 'welcome#about'
 
+   get 'tasks' => 'tasks#index'
+
+
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
@@ -18,7 +23,7 @@ Rails.application.routes.draw do
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
+   resources :users
 
   # Example resource route with options:
   #   resources :products do

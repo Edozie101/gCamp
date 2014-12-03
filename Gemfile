@@ -31,6 +31,10 @@ gem "pg"
 
 group :production do
   gem "rails_12factor"
+  gem "better_errors"
+  gem "binding_of_caller"
+
+
 end
 
 gem 'bootstrap-sass', '~> 3.3.1'

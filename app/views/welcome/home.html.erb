@@ -1,10 +1,9 @@
 
-    <p>
-        <div class="container" style="padding: 2px">
-          <div class="jumbotron"><h1> gCamp</h1>
-          <div class= "lead">get SUPER organized! </div>
+<div class="container" style="padding: 2px">
+  <div class="jumbotron"><h1> gCamp</h1>
+    <div class= "lead">get SUPER organized! </div>
          </div>
-      </div>
+
    </p>
    <div class="row"  style="padding: 135px">
      <div class="col-md-4">
@@ -40,5 +39,23 @@
         </div>
     </div>
   </div>
-<a href="#" onclick="playSound('');">Click here to hear a sound</a>
-<p onmouseover="playSound('UrlToSoundFile');">Mouse over this text to hear a sound</p>
+</div>
+
+<div class="container">
+<% @quotesncharacters.each_with_index do |text,i|  %>
+
+<% if i.even? %>
+<dt> "<%= text %>"" </dt>
+<% else %>
+<dd class="text-muted"> -<%= text %>  </dd>
+<br>
+<% end %>
+<% end %>
+</div>
+
+
+<hr>
+<footer>
+<% link_to "About", "about" %>
+<%= link_to "Terms", "terms" %>
+</footer>
