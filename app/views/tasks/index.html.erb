@@ -1,15 +1,50 @@
-<div class="container">
-  <table>
-    <%= @task.each do |task|  %>
-    <tr>
-
-      <td>
-        <%= task.description %>
-      </td>
-
-    </tr>
-
-
-
-  </table>
+<div class="page-header">
+  <div class="pull-right">
+    <%= link_to 'New Task', new_task_path, class:"btn btn-primary" %>
+  </div>
+  <div class="pull-right filter">
+    <% if params[:type] == "incomplete" %>
+      <%= link_to 'All', type:'all' %> | Incomplete
+    <% else %>
+      All | <%= link_to 'Incomplete', type:'incomplete' %>
+    <% end %>
+  </div>
+  <h1>Tasks</h1>
 </div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Complete</th>
+      <th>Due</th>
+      <th colspan="4"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tasks.each do |task| %>
+      <% if task.date.class == Date && task.date <= Date.today+7 && task.complete == false %>
+        <tr class="red">
+      <% else %>
+        <tr>
+      <% end %>
+        <td>
+          <%= task.description %>
+        </td>
+        <td>
+          <%= task.completed %>
+        </td>
+        <td>
+          <%= task.date %>
+        </td>
+        <td class="pull-right">
+          <%= link_to 'Show', task, class:"btn btn-success" %>
+          <%= link_to 'Edit', edit_task_path(task), class:"btn btn-primary" %>
+          <%= link_to 'Delete', task, method: :delete, data: { confirm: 'Are you really sure?' }, class:"btn btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>

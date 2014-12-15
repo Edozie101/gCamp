@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>GCamp</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-     <div class="container">
-       <h2><font color="white"> gCamp</font> <%= image_tag("glogo.png", size: "60") %></h2>
-     </div>
-   </nav>
-
-<%= yield %>
-
-
-</body>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <title>gCamp</title>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <%= link_to 'gCamp','/', class:'navbar-brand' %>
+        </div>
+    </nav>
+    <div class="container">
+      <%= yield %>
+      <footer class="site-footer col-md-12">
+        <%= link_to 'About', 'about', class:'navbar-brand' %>
+         <%= link_to 'Terms', 'terms', class:'navbar-brand' %>
+         <%= link_to 'FAQ', 'faq', class:'navbar-brand' %>
+          <%= link_to 'Projects', projects_path, class:'navbar-brand' %>
+          <%= link_to 'Tasks', tasks_path, class:'navbar-brand' %>
+           <%= link_to 'Users', users_path, class:'navbar-brand' %>
+      </footer>
+    </div>
+  </body>
 </html>
