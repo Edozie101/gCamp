@@ -12,6 +12,7 @@ class WelcomeController < ApplicationController
   end
 
   def faq
+    @faq = ["What do I do if I have a problem?", "Well if you have a problem come to me ","But what if I'm nerrrrrvousssss..", "No choice dude, you're answering my questions" ]
 
   end
 
