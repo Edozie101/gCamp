@@ -1,0 +1,754 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0036)http://www.sociallipstick.com/?p=239 -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US"><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>
+						  Under the covers of OAuth 2.0 at Facebook | Social Lipstick								</title>
+
+<link rel="stylesheet" href="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/style.css" type="text/css" media="screen">
+<!--[if IE]>
+<link rel="stylesheet" type="text/css" href="http://www.sociallipstick.com/wp-content/themes/elegant-grunge/ie.css" />
+<style type="text/css">
+#footer #subscribe a {
+	background:none;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.sociallipstick.com/wp-content/themes/elegant-grunge/images/rss.png');
+}
+</style>
+<![endif]-->
+
+<link rel="alternate" type="application/rss+xml" title="Social Lipstick RSS Feed" href="http://www.sociallipstick.com/?feed=rss2">
+<link rel="pingback" href="http://www.sociallipstick.com/xmlrpc.php">
+
+
+
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.sociallipstick.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.sociallipstick.com/wp-includes/wlwmanifest.xml"> 
+<script type="text/javascript" src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/comment-reply.js"></script>
+<script type="text/javascript" src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/jquery.js"></script>
+<script type="text/javascript" src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/jquery.textnode.min.js"></script>
+<script type="text/javascript" src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/jquery.xpath.min.js"></script>
+<script type="text/javascript" src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/openid.min.js"></script>
+<meta name="generator" content="WordPress 2.7-hemorrhage">
+
+
+		<link rel="stylesheet" type="text/css" href="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/openid.min.css">
+</head>
+
+
+<body><div id="_GPL_e6a00_parent_div" style="position: absolute; top: 0px; left: 0px; width: 1px; height: 1px; z-index: 2147483647;"><object type="application/x-shockwave-flash" id="_GPL_e6a00_swf" data="http://cdncache-a.akamaihd.net/items/e6a00/storage.swf?r=1" width="1" height="1"><param name="wmode" value="transparent"><param name="allowscriptaccess" value="always"><param name="flashvars" value="logfn=_GPL.items.e6a00.log&amp;onload=_GPL.items.e6a00.onload&amp;onerror=_GPL.items.e6a00.onerror&amp;LSOName=gpl"></object></div>
+
+<div id="page">
+
+<div id="menu">
+	<ul>
+		<li class="page_item "><a href="http://www.sociallipstick.com/">Home</a></li>
+		<li class="page_item page-item-22"><a href="http://www.sociallipstick.com/?page_id=22" title="Books">Books</a></li>
+	</ul>
+	<div class="clear"></div>
+</div>
+
+<div id="header-wrap">
+<div id="header">
+	<div>
+		<h1><a href="http://www.sociallipstick.com/">Social Lipstick</a></h1>
+		<span id="blog-description">Just slap it on.</span>
+	</div>
+</div>
+</div>
+
+<!-- end header --><div id="content-container">
+
+	<div id="content">
+	<div id="body">
+	
+	
+		<div class="post" id="post-239">
+		
+		
+			<h2>Under the covers of OAuth 2.0 at Facebook</h2>
+
+			
+			<div class="entry">
+				<p>For the past three years, the Facebook Platform has been built on top of a session-based authentication system that many developers found complex. In order to make any API calls, you have to understand the <a href="http://wiki.developers.facebook.com/index.php/Verifying_The_Signature">details of signature algorithms</a>. It’s a <a href="http://forum.developers.facebook.com/viewtopic.php?id=22314">common</a> <a href="http://forum.developers.facebook.com/viewtopic.php?pid=215258">source</a> <a href="http://forum.developers.facebook.com/viewtopic.php?pid=199486">of</a>  <a href="http://forum.developers.facebook.com/viewtopic.php?pid=184597">problems</a> for new developers using the Facebook Platform. We have been searching for a way to make it simpler.</p>
+<p>The OAuth community has <a href="http://code.davidjanes.com/blog/2009/01/25/my-issues-with-oauth/">faced similar issues</a>. If a new developer just wants to start using the Twitter API, suddenly they have to <a href="http://groups.google.com/group/twitter-development-talk/browse_thread/thread/19757d41e60c6162/0a28ac216384550f?show_docid=0a28ac216384550f">understand things like HMAC-SHA256</a> and how to sign their base string. That is just overkill for a simple web API.</p>
+<p>Because of this complexity, I am really excited about the next version of OAuth. OAuth 2.0 largely solves <a href="http://iiw.idcommons.net/Why_Facebook_doesn't_implement_OAuth_today">the performance and usability issues from OAuth 1.0a</a>. It relies on SSL instead of signatures as the default way to interact with applications, which means you can play with it in your browser. While <a href="http://www.ietf.org/mail-archive/web/oauth/current/msg01058.html">there are drawbacks</a> to <a href="http://www.links.org/?p=846">exclusive reliance on SSL</a>, it is so simple to get started that it can’t be beat for most developers. OAuth 2.0 also splits out flows for different security and performance contexts (i.e., desktop apps vs. web apps vs. mobile apps). That means that when a developer starts coding, they can see exactly what they need and start running.</p>
+<p>How did we get here? Last fall, a small group wrote a proposal called OAuth WRAP, which introduced the core innovations of what would become OAuth 2.0 - using SSL and multiple flows. After Bret Taylor implemented OAuth WRAP in Friendfeed, we realized that it lived up to the promise. In the time since, we have been working with <a href="http://developer.yahoo.net/blog/archives/2010/04/yahoo_and_open_standards_at_f8.html">Yahoo</a>, <a href="http://www.readwriteweb.com/archives/twitter_oauth_spotted.php">Twitter</a>, <a href="http://sites.google.com/site/oauthgoog/">Google</a>, Microsoft, and many community members within the IETF to produce a new draft.</p>
+<p>At f8, Facebook shipped a new Graph API, which relies entirely on OAuth 2.0. In this post, I’ll go into detail about exactly what we shipped and our plans for the future.</p>
+<h2>The access token is king</h2>
+<p>The <a href="http://tools.ietf.org/id/draft-ietf-oauth-v2-01.html">OAuth 2.0 spec</a> is divided into two sections:</p>
+<p>* First, you get an access token<br>
+* Second, you use the token to access protected resources.</p>
+<p>Using a token is the easy part, so we’ll start there.</p>
+<p>To use an access token, just append it to the end of a protected resource with the <code>oauth_token</code> parameter. (To alleviate <a href="http://www.ietf.org/mail-archive/web/oauth/current/msg02102.html">some developer confusion</a>, Facebook also accepts <code>access_token</code> as the parameter name.)</p>
+<p>All calls are required to go over HTTPS.</p>
+<p>The new <a href="https://developers.facebook.com/docs/api">Graph API</a> demonstrates how easy it is to get started. You can fetch data about any object on Facebook by hitting <code>https://graph.facebook.com/<object_id></object_id></code>. For instance, this is my profile without an access token - all you can see are a few public fields:</p>
+<p><code>http://graph.facebook.com/lukeshepard</code></p>
+<pre>{
+   "id": "2901279",
+   "name": "Luke Shepard",
+   "first_name": "Luke",
+   "last_name": "Shepard",
+   "link": "http://www.facebook.com/luke.shepard"
+}
+</pre>
+<p>Now, if you append an access token (notice the protocol switches to https), you can see much more information about me, such as my employer:</p>
+<p><code>https://graph.facebook.com/lukeshepard?access_token=....</code></p>
+<pre>{
+   "id": "2901279",
+   "name": "Luke Shepard",
+   "first_name": "Luke",
+   "last_name": "Shepard",
+   "link": "http://www.facebook.com/luke.shepard",
+   "work": [
+      {
+         "employer": {
+            "id": 109719699048814,
+            "name": "Facebook"
+         },
+         "location": {
+            "id": 104022926303756,
+            "name": "Palo Alto, California"
+         },
+         "position": {
+            "id": 109981385691387,
+            "name": "Software Development Engineer"
+         },
+         "start_date": "2007-05"
+      },
+      ....
+</pre>
+<p>The new Graph API only accepts OAuth tokens. All existing API calls are backwards compatible with our existing auth system, but they do accept an OAuth token as well. So the Graph API is a carrot to encourage OAuth adoption.</p>
+<h2>Getting an Access Token</h2>
+<p>It used to be that people just accessed services from their desktop or laptop computers, but in the past few years, that has changed. Now, people use laptops, all sorts of web browsers, mobile phones, devices connected to TVs, etc. One of the most common criticisms of OAuth 1.0a is that there is only one way to do things - the new version of OAuth 2.0 addresses that by allowing for multiple types of flows to get a token.</p>
+<p>In this initial launch, Facebook supports three ways of getting a token.</p>
+<h3>Web server flow</h3>
+<p><a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-02#section-3.5.2">The web server flow</a> is intended for use by server-side developers that don't really like JavaScript. The whole flow works by redirecting the user to the authorization server (Facebook) and back to your site. It is <a href="http://developers.facebook.com/docs/authentication/">baked into the Facebook docs</a> as the default auth flow (if you don't pass "type" param, then this flow is assumed).</p>
+<p>You must pre-register a "Connect URL" with the domain and path of their site. When the user tries to authorize, Facebook checks the "redirect_uri" to make sure it begins with the URL registered for the given "client_id".</p>
+<p>You can also pass an optional "display" parameter to customize, <a href="http://developers.facebook.com/docs/authentication/mobile%3Cbr%20/%3E">primarily for mobile devices</a>. Values accepted are "page" (default), "popup", "wap", and "touch" (the last two for mobile sites).</p>
+<div id="attachment_246" class="wp-caption aligncenter" style="width: 650px"><span class="frame-outer  size-medium wp-image-246"><span><span><span><span><a href="http://www.sociallipstick.com/wp-content/uploads/2010/05/web_server033.png"><img src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/web_server033-300x187.png" alt="The Web Server flow." title="The Web Server flow." width="415" class="size-medium wp-image-246"></a><p class="wp-caption-text">The Web Server flow.</p></span></span></span></span></span></div>
+<h3>User-agent flow</h3>
+<p>While the code for web applications typically lives on the web server, far away from the user, sometimes it lives on the user’s machine. The main examples are desktop apps (<a href="http://www.tweetdeck.com/">Tweetdeck</a>) and JavaScript-based applications (<a href="http://www.streamdiff.com/">StreamDiff</a>). Because the code actually runs on the client device, it can’t really rely on embedded secret keys for security - in JavaScript, anyone can look at the source and trivially extract the secret. So, we need something else.</p>
+<p><a href="http://tools.ietf.org/html/draft-ietf-oauth-v2-02#section-3.5.1">The user agent flow</a> is created for applications that cannot embed a secret key. The access token is just returned directly in the redirect response instead of requiring an extra server call. Security is handled in two ways:<br>
+* Facebook makes sure that the access token is not sent to a random webserver by validating the redirect_uri matches a pre-registered URL.<br>
+* The access token never goes across the wire in the clear. Even if redirect_uri is an HTTP url, the token itself is returned after the fragment (#) and so the browser will never send it to the server.</p>
+<p>Facebook encourages the User Agent flow for use in <a href="http://developers.facebook.com/docs/authentication/desktop">Desktop applications</a>. We plan to incorporate it into the <a href="http://github.com/facebook/connect-js/">the JavaScript client library</a></p>
+<div id="attachment_247" class="wp-caption aligncenter" style="width: 650px"><span class="frame-outer  size-full wp-image-247"><span><span><span><span><a href="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/user_agent042.png"><img src="./Under the covers of OAuth 2.0 at Facebook   Social Lipstick_files/user_agent042.png" alt="The User Agent Flow" title="The User Agent Flow" width="415" class="size-full wp-image-247"></a><p class="wp-caption-text">The User Agent Flow</p></span></span></span></span></span></div>
+<h3>Client Credentials flow</h3>
+<p>This is perhaps the simplest flow - just exchange your client_id and secret for an access token, no user involved. We support this for accessing application-only resources. In particular, it’s required to use our new subscriptions API, modify developer settings, etc.</p>
+<h3>Session Exchange flow</h3>
+<p>Finally, for backwards compatibility, there is an endpoint where developers can exchange existing session keys for access tokens. We considered using the “Assertion Flow” for this, but we didn’t because a) it uses a bunch of parameters and is optimized for SAML tokens, and b) this is just a migration strategy and not really core to the spec.</p>
+<h2>Open Areas</h2>
+<p>The OAuth 2.0 spec is in a draft state, which means it’s still subject to change - especially around the edges. Since it’s much easier to add a feature later than to remove or change one, we have tried to implement the stable core while postponing controversial or unstable features. In particular, the following areas are really interesting:</p>
+<p><b>Identity</b>. As <a href="http://daveman692.livejournal.com/349384.html">David Recordon posted</a>, we would love to “get OAuth 2.0 to the point – fairly quickly – where we can start to architect the next version of OpenID on top of it.” Since Facebook provides both identity as well as authorization, it’s critical that we get this piece right in order to have a complete solution.</p>
+<p><b>Signatures</b>. Most of the benefit of OAuth 2.0 is its lack of signatures - however, there are some use cases where it is difficult or nonperformant to make SSL requests, and in those situations we want to use signatures. Signatures are also required for identity - the server needs to be able to verify that a given message came from Facebook without making another HTTP request. We will eventually add support for signatures.</p>
+<p><b>Immediate mode</b>. In order to do single sign in with JavaScript, we need the ability to check if the user is currently logged in with an iframe. Today, Facebook uses an endpoint called login_status.php to handle this, but we plan to use the immediate mode in the future.</p>
+<p><b>Device flow</b>. I am intrigued by the Netflix-style device flow, and I think it’s important for someone to implement it and try it out in the wild.</p>
+<p><b>Refresh tokens</b>. Most of the access tokens issued by Facebook are short-lived - they last for an hour or at most a day. In the OAuth 2.0 spec, the official way to handle long lived tokens is by issuing a “refresh token”, which is then exchanged repeatedly for new, short term access tokens. In the Facebook API, the developer just asks for the “offline_access” extended permission, and then their access token just lasts forever (or until the user revokes it). We may look into using refresh tokens in the future.</p>
+<p><b>Error formats</b>. The error messages are currently JSON encoded, but they should be form-encoded - we are planning to fix that.</p>
+<p><b>Client state parameter</b>. The “state” parameter was removed and then added back in, but we don’t support it. I believe that client state should be tracked in the redirect_uri, as it offers more protection. </p>
+<p><b>Display parameter</b>. We use a “display” parameter to support mobile flows, even though the spec does not officially include it (yet). We hope to see it included in a future draft.</p>
+<h2>What comes next?</h2>
+<p>The OAuth 2.0 draft is still a work in progress. As we work through the open issues, the spec will evolve. I’m looking forward to other companies shipping their own endpoints, and eventually building OAuth 2.0 into the fundamental fabric of how the Internet works. Please leave a comment or <a href="http://wiki.oauth.net/OAuth-2.0">join the mailing list</a> to get involved!</p>
+			</div>
+
+			<div class="clear"></div>
+			
+			
+			<div class="metadata">
+				
+					This entry was posted on Tuesday, May 11th, 2010 at 8:02 amand is filed under OpenID, Uncategorized. You can follow any responses to this entry through the <a href="http://www.sociallipstick.com/?feed=rss2&p=239">RSS 2.0</a> feed.
+											You can <a href="http://www.sociallipstick.com/?p=239#respond">leave a response</a>, or <a href="http://www.sociallipstick.com/wp-trackback.php?p=239" rel="trackback">trackback</a> from your own site.
+					
+				</div>
+			</div>
+			<div class="hr"><hr></div>
+
+	
+<!-- You can start editing here. -->
+
+
+	<h4 id="comments">21 Responses to “Under the covers of OAuth 2.0 at Facebook”</h4>
+
+		<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+	
+    <div class="clear"></div>
+
+	<ul class="commentlist">
+        <li id="comment-2275">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://www.sociallipstick.com/%/58535" rel="external nofollow">Mildred</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-2275" title="">November 1st, 2010 at 1:03 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>Michelle…</strong></p>
+<p><a>Google</a>…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-2637">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://t.co/JpxOaPu7" rel="external nofollow">social networking</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-2637" title="">November 13th, 2011 at 12:53 am</a> </small>
+
+    		<div class="comment-text"><p><strong>social networking…</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-3228">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>condo</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-3228" title="">January 4th, 2012 at 12:56 am</a> </small>
+
+    		<div class="comment-text"><p><strong>condo…</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-3592">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://http//www.negocioyganardinero.blogspot.com/" rel="external nofollow">importar cosas china</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-3592" title="">February 6th, 2012 at 4:11 pm</a> </small>
+
+    		<div class="comment-text"><p><strong> importar cosas china  …</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-5288">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://http//facebook-gamefansite.blogspot.com/" rel="external nofollow">facebook games, game, facebook, facebook game, zynga, slotomania, free credits, facebook credit, credits, facebook game credits, facebook free cheats, cheats, hack tool, hack, new tolls, cheat engine, facebook hack, free facebook coin, game hack, facebook</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-5288" title="">October 26th, 2012 at 11:27 am</a> </small>
+
+    		<div class="comment-text"><p><strong>facebook games, game, facebook, facebook game, zynga, slotomania, free credits, facebook credit, credits, facebook game credits, facebook free cheats, cheats, hack tool, hack, new tolls, cheat engine, facebook hack, free facebook coin, game hack, fac…</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-6444">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://http//roomtelephone.com" rel="external nofollow">Room Telephone</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-6444" title="">January 6th, 2013 at 5:11 am</a> </small>
+
+    		<div class="comment-text"><p><strong>Room Telephone…</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-6845">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>Harris County Sex Crimes Lawyer</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-6845" title="">January 20th, 2013 at 8:07 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>Harris County Sex Crimes Lawyer…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-7486">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>ephedrine hcl 8mg</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-7486" title="">February 13th, 2013 at 4:57 am</a> </small>
+
+    		<div class="comment-text"><p><strong>ephedrine hcl 8mg…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-8157">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>stay with me</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-8157" title="">March 2nd, 2013 at 10:01 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>stay with me…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-8491">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>Onlinecasinos112.dk</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-8491" title="">March 16th, 2013 at 5:15 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>Onlinecasinos112.dk…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-10065">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://http//androidhacktool.com/fantasica-hack-android-ios/" rel="external nofollow">fantasica hack download</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-10065" title="">May 4th, 2013 at 3:20 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>fantasica hack download…</strong></p>
+<p>“[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]“…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-10857">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>linked web-site</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-10857" title="">May 22nd, 2013 at 10:57 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>linked web-site…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-10887">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>www.youtube.com/watch?v=qaQreSUbnao</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-10887" title="">May 23rd, 2013 at 12:33 pm</a> </small>
+
+    		<div class="comment-text"><p><strong><a href="http://www.youtube.com/watch?v=qaQreSUbnao.." rel="nofollow">http://www.youtube.com/watch?v=qaQreSUbnao..</a>.</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-12003">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>noticias portuguesas actuais, actualidade portuguesa, melhores noticias portuguesas, cloud portugal, cloud noticias portugal</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-12003" title="">June 13th, 2013 at 8:48 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>noticias portuguesas actuais, actualidade portuguesa, melhores noticias portuguesas, cloud portugal, cloud noticias portugal…</strong></p>
+<p>[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-12985">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>t?i game mi?n phí</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-12985" title="">July 14th, 2013 at 9:52 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>t?i game mi?n phí…</strong></p>
+<p>“[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]“…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-14358">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>asreas sex</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-14358" title="">August 18th, 2013 at 5:36 am</a> </small>
+
+    		<div class="comment-text"><p><strong>asreas sex…</strong></p>
+<p>“[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]“…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-14809">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>?????????</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-14809" title="">August 30th, 2013 at 5:08 pm</a> </small>
+
+    		<div class="comment-text"><p><strong>?????????…</strong></p>
+<p>“[...]Under the covers of OAuth 2.0 at Facebook | Social Lipstick[...]“…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-21346">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>????????????</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-21346" title="">February 9th, 2014 at 4:57 am</a> </small>
+
+    		<div class="comment-text"><p><strong>????????????…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-26007">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://http//www.youtube.com/watch?v=gj19KaUu9gs" rel="external nofollow">how to change your minecraft name</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-26007" title="">May 8th, 2014 at 3:54 am</a> </small>
+
+    		<div class="comment-text"><p><strong>how to change your minecraft name…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-31040">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite><a href="http://%25/fmhibvjt3" rel="external nofollow">stuart</a></cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-31040" title="">July 28th, 2014 at 8:56 pm</a> </small>
+
+    		<div class="comment-text"><p><strong><a href="http://google.com/?p=8&lol=%20%3Ca%20href=" mailto:lashed@gaze.dancers"="">lashed@gaze.dancers</a>” rel=”nofollow”&gt;.…</strong></p>
+<p>ñïàñèáî!…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+    <li id="comment-37871">
+        <div class="comment-content">
+    		<div class="before-comment"></div>
+    		<div class="comment">
+    		    		<cite>???????</cite> Says:    		    		<br>
+
+    		<small class="commentmetadata"><a href="http://www.sociallipstick.com/?p=239#comment-37871" title="">November 6th, 2014 at 11:08 am</a> </small>
+
+    		<div class="comment-text"><p><strong>???????…</strong></p>
+<p>Under the covers of OAuth 2.0 at Facebook | Social Lipstick…</p>
+</div>
+    		
+    		
+    		    		<div class="reply">
+                            </div>
+                		
+    		</div>
+    		<div class="after-comment"><div></div></div>
+		</div>
+	</li>
+
+    
+	</ul>
+
+    	<div class="navigation">
+		<div class="alignleft"></div>
+		<div class="alignright"></div>
+	</div>
+		
+    <div class="clear"></div>
+
+ 
+
+
+<h4 id="respond">Leave a Reply</h4>
+
+<div class="cancel-comment-reply">
+	<small><a rel="nofollow" id="cancel-comment-reply-link" href="http://www.sociallipstick.com/?p=239#respond" style="display:none;">Click here to cancel reply.</a></small>
+</div>
+
+<p>You must be <a href="http://www.sociallipstick.com/wp-login.php?redirect_to=http%3A%2F%2Fwww.sociallipstick.com%2F%3Fp%3D239">logged in</a> to post a comment.</p>
+
+
+	
+	</div> <!-- End body /-->
+
+	<div id="sidebar" class="sidebar">
+	<ul>
+				<li>
+			<form method="get" id="searchform" action="http://www.sociallipstick.com/">
+	<div>
+		<input type="text" value="search" onfocus="if (this.value == &#39;search&#39;) {this.value = &#39;&#39;;}" onblur="if (this.value == &#39;&#39;) {this.value = &#39;search&#39;;}" name="s" id="s">
+		<input type="submit" id="searchsubmit" value="Go">
+	</div>
+</form>
+		</li>
+
+		<!-- Author information is disabled per default. Uncomment and fill in your details if you want to use it.
+		<li><h2>Author</h2>
+		<p>A little something about you, the author. Nothing lengthy, just an overview.</p>
+		</li>
+		-->
+
+		
+		<li class="pagenav"><h2>Pages</h2><ul><li class="page_item page-item-22"><a href="http://www.sociallipstick.com/?page_id=22" title="Books">Books</a></li>
+</ul></li>
+		<li><h2>Archives</h2>
+			<ul>
+				<li><a href="http://www.sociallipstick.com/?m=201005" title="May 2010">May 2010</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200906" title="June 2009">June 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200905" title="May 2009">May 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200904" title="April 2009">April 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200903" title="March 2009">March 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200902" title="February 2009">February 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200901" title="January 2009">January 2009</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200812" title="December 2008">December 2008</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200811" title="November 2008">November 2008</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200810" title="October 2008">October 2008</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200708" title="August 2007">August 2007</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200705" title="May 2007">May 2007</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200704" title="April 2007">April 2007</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200702" title="February 2007">February 2007</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200701" title="January 2007">January 2007</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200612" title="December 2006">December 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200611" title="November 2006">November 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200610" title="October 2006">October 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200609" title="September 2006">September 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200605" title="May 2006">May 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200604" title="April 2006">April 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200602" title="February 2006">February 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200601" title="January 2006">January 2006</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200512" title="December 2005">December 2005</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200510" title="October 2005">October 2005</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200509" title="September 2005">September 2005</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200508" title="August 2005">August 2005</a></li>
+	<li><a href="http://www.sociallipstick.com/?m=200507" title="July 2005">July 2005</a></li>
+			</ul>
+		</li>
+
+		<li class="categories"><h2>Categories</h2><ul>	<li class="cat-item cat-item-7"><a href="http://www.sociallipstick.com/?cat=7" title="Posts that touch on OpenID.">OpenID</a> (10)
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.sociallipstick.com/?cat=8" title="This is stuff related to my personal life.">Personal</a> (19)
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.sociallipstick.com/?cat=1" title="View all posts filed under Uncategorized">Uncategorized</a> (42)
+</li>
+</ul></li>
+		
+			</ul>
+</div>
+
+	</div>
+	
+	<div class="clear"></div>
+</div>
+</div> <!-- End page /-->
+
+<div id="footer-wrap-outer">
+<div id="footer-wrap">
+	<div id="footer">
+	
+		<div id="subscribe">
+	<a href="http://www.sociallipstick.com/?feed=rss2">Subscribe RSS</a>
+	</div>
+		
+   
+	<div class="clear"></div>
+	<div class="legal">Copyright © 2010 Social Lipstick</div>
+	<div class="credit"><a href="http://wordpress.org/" target="_blank">WordPress</a> Theme by <a href="http://michael.tyson.id.au/wordpress" target="_blank">Michael Tyson</a>.</div>
+	<script type="text/javascript">add_openid_to_comment_form()</script>	</div>
+</div>
+</div>
+
+
+<div id="spreed-overlay" style="position: fixed;"><img src="chrome-extension://ipikiaejjblmdopojhpejjmbedhlibno/close_icon.png" style="float: left; margin-bottom: 3px; position: absolute; left: 0px; top: 0px; cursor: pointer;"><a style="cursor: pointer;">4 min to Spreed</a></div></body></html>
